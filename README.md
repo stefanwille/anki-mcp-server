@@ -98,8 +98,8 @@ pnpm unlink --global
 ### Publish to npm
 
 ```bash
-npm version patch  # or minor, major
-npm publish
+pnpm version patch  # or minor, major
+pnpm publish
 ```
 
 ## License
