@@ -1,6 +1,6 @@
 {
   "name": "stefanwille-anki-mcp-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Anki MCP server for flashcard management",
   "type": "module",
   "main": "dist/index.js",
