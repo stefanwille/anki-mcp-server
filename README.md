@@ -10,9 +10,15 @@ A Model Context Protocol (MCP) server for managing [Anki](https://apps.ankiweb.n
 - Node.js 22+ ([Download](https://nodejs.org/en/download))
 - Anki running, with AnkiConnect on `http://127.0.0.1:8765` (default)
 
-## Installation
+## Installation in Claude Desktop
 
-Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
+
+- Open Claude Desktop
+- Go to: "Claude" / "Settings..."
+- Tab "Developer"
+- Click "Edit Config"
+
+Edit your Claude Desktop config (`claude_desktop_config.json`), and add:
 
 ```json
 {
@@ -26,6 +32,8 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 ```
 
 Restart Claude Desktop to activate.
+
+
 
 ## Example Prompts
 
