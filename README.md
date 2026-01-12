@@ -19,7 +19,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
   "mcpServers": {
     "anki": {
       "command": "npx",
-      "args": ["stefanwille-anki-mcp-server"]
+      "args": ["-y", "stefanwille-anki-mcp-server@latest"]
     }
   }
 }
