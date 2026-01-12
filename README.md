@@ -41,10 +41,10 @@ Restart Claude Desktop to activate.
 - "Show the cards in my Spanish vocabulary deck"
 - "Check all cards in deck 'Italiano::Capitulo 3' for grammatical errors and correct them"
 - "Create a card in my Italian deck with 'ciao' on the front and 'hello' on the back"
-- "Extract the vocabulary from the foto and add it to my Italian deck with Italian on the front and German on the back: ..."
+- "Extract the vocabulary from the photo and add it to my Italian deck with Italian on the front and German on the back: ..."
 - "Create a new deck called 'Physics::Quantum Mechanics'"
 - "Rename my 'Math' deck to 'Mathematics'"
-- "Give me an exercise that requires me to use the italian words in the deck 'Italienisch::Capitulo 6::Italienisch 38 - 2025-08-01'"
+- "Give me an exercise that requires me to use the Italian words in the deck 'Italienisch::Capitulo 6::Italienisch 38 - 2025-08-01'"
 
 ## Tools
 
