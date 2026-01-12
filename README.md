@@ -1,5 +1,7 @@
 # Anki MCP Server
 
+[![npm](https://img.shields.io/npm/v/stefanwille-anki-mcp-server)](https://www.npmjs.com/package/stefanwille-anki-mcp-server)
+
 A Model Context Protocol (MCP) server for managing [Anki](https://apps.ankiweb.net/) flashcards. Connects to [AnkiConnect](https://foosoft.net/projects/anki-connect/) to enable AI assistants to create, read, and update flashcards.
 
 ## Prerequisites
