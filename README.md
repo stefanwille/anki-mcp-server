@@ -99,10 +99,15 @@ pnpm unlink --global
 
 ### Publish to npm
 
+Create a GitHub release to trigger the npm publish workflow:
+
 ```bash
 pnpm version patch  # or minor, major
-pnpm publish
+git push && git push --tags
+gh release create v$(node -p "require('./package.json').version") --generate-notes
 ```
+
+This triggers the GitHub Actions workflow that publishes to npm automatically.
 
 ## License
 
