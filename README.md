@@ -42,6 +42,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 - "Show the cards in my Spanish vocabulary deck"
 - "Check all cards in deck 'Italiano::Capitulo 3' for grammatical errors and correct them"
 - "Create a card in my Italian deck with 'ciao' on the front and 'hello' on the back"
+- "Extract the vocabulary from the foto and add it to my Italian deck with Italian on the front and German on the back: ..."
 - "Create a new deck called 'Physics::Quantum Mechanics'"
 - "Rename my 'Math' deck to 'Mathematics'"
 
