@@ -1,6 +1,6 @@
 # Anki MCP Server
 
-A Model Context Protocol (MCP) server for managing Anki flashcards. Connects to [AnkiConnect](https://foosoft.net/projects/anki-connect/) to enable AI assistants to create, read, and update flashcards.
+A Model Context Protocol (MCP) server for managing [Anki](https://apps.ankiweb.net/) flashcards. Connects to [AnkiConnect](https://foosoft.net/projects/anki-connect/) to enable AI assistants to create, read, and update flashcards.
 
 ## Prerequisites
 
