@@ -52,10 +52,10 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 | Tool | Description |
 |------|-------------|
 | `get_decks` | Get all deck names from Anki |
+| `create_deck` | Create a new deck |
 | `list_cards` | List cards in a deck with front/back content |
 | `create_card` | Create a new basic card |
 | `update_card` | Update an existing card's content |
-| `create_deck` | Create a new deck |
 | `rename_deck` | Rename a deck |
 
 
