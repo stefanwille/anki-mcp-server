@@ -45,6 +45,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 - "Extract the vocabulary from the foto and add it to my Italian deck with Italian on the front and German on the back: ..."
 - "Create a new deck called 'Physics::Quantum Mechanics'"
 - "Rename my 'Math' deck to 'Mathematics'"
+- "Give me an exercise that requires me to use the italian words in the deck 'Italienisch::Capitulo 6::Italienisch 38 - 2025-08-01'"
 
 
 ## Tools available to Claude Desktop
