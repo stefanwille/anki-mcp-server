@@ -6,23 +6,9 @@ A Model Context Protocol (MCP) server for managing [Anki](https://apps.ankiweb.n
 
 - [Anki](https://apps.ankiweb.net/) with [AnkiConnect](https://ankiweb.net/shared/info/2055492159) add-on installed
 - Node.js 22+ ([Download](https://nodejs.org/en/download))
-- pnpm installed ([Installation](https://pnpm.io/installation))
 - Anki running, with AnkiConnect on `http://127.0.0.1:8765` (default)
 
 ## Installation
-
-```bash
-pnpm install
-pnpm build
-pnpm link --global
-```
-
-This makes the command `stefanwille-anki-mcp-server` available system-wide.
-
-
-## Configuration
-
-### Configure with Claude Desktop
 
 Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json` on macOS):
 
@@ -30,11 +16,14 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 {
   "mcpServers": {
     "anki": {
-      "command": "stefanwille-anki-mcp-server"
+      "command": "npx",
+      "args": ["stefanwille-anki-mcp-server"]
     }
   }
 }
 ```
+
+Restart Claude Desktop to activate.
 
 ## Example Prompts
 
@@ -47,8 +36,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 - "Rename my 'Math' deck to 'Mathematics'"
 - "Give me an exercise that requires me to use the italian words in the deck 'Italienisch::Capitulo 6::Italienisch 38 - 2025-08-01'"
 
-
-## Tools available to Claude Desktop
+## Tools
 
 | Tool | Description |
 |------|-------------|
@@ -59,11 +47,59 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
 | `update_card` | Update an existing card's content |
 | `rename_deck` | Rename a deck |
 
+## Development
 
-## Uninstall
+### Prerequisites
+
+- Node.js 22+
+- pnpm ([Installation](https://pnpm.io/installation))
+
+### Build from Source
+
+```bash
+git clone https://github.com/stefanwille/anki-mcp-server.git
+cd anki-mcp-server
+pnpm install
+pnpm build
+```
+
+### Watch Mode
+
+```bash
+pnpm watch
+```
+
+Rebuilds automatically on file changes.
+
+### Install Locally
+
+```bash
+pnpm link --global
+```
+
+This makes `stefanwille-anki-mcp-server` available system-wide. Update Claude Desktop config to use the command directly:
+
+```json
+{
+  "mcpServers": {
+    "anki": {
+      "command": "stefanwille-anki-mcp-server"
+    }
+  }
+}
+```
+
+### Uninstall Local Version
 
 ```bash
 pnpm unlink --global
+```
+
+### Publish to npm
+
+```bash
+npm version patch  # or minor, major
+npm publish
 ```
 
 ## License
