@@ -67,7 +67,7 @@ server.registerTool(
       const decks = await ankiRequest<string[]>("deckNames");
       const output = { decks };
       return {
-        content: [{ type: "text", text: `Found ${decks.length} decks` }],
+        content: [{ type: "text", text: JSON.stringify(output) }],
         structuredContent: output,
       };
     } catch (error) {
@@ -100,7 +100,7 @@ server.registerTool(
       if (!cardIds || cardIds.length === 0) {
         const output = { cards: [] };
         return {
-          content: [{ type: "text", text: "No cards found in this deck." }],
+          content: [{ type: "text", text: JSON.stringify(output) }],
           structuredContent: output,
         };
       }
@@ -119,7 +119,7 @@ server.registerTool(
 
       const output = { cards };
       return {
-        content: [{ type: "text", text: `Found ${cards.length} cards` }],
+        content: [{ type: "text", text: JSON.stringify(output) }],
         structuredContent: output,
       };
     } catch (error) {
@@ -160,7 +160,7 @@ server.registerTool(
 
       const output = { noteId, deckName: deck_name };
       return {
-        content: [{ type: "text", text: `Created card with note ID: ${noteId}` }],
+        content: [{ type: "text", text: JSON.stringify(output) }],
         structuredContent: output,
       };
     } catch (error) {
@@ -219,7 +219,7 @@ server.registerTool(
 
       const output = { noteId: note_id, updated: true };
       return {
-        content: [{ type: "text", text: `Updated note ${note_id}` }],
+        content: [{ type: "text", text: JSON.stringify(output) }],
         structuredContent: output,
       };
     } catch (error) {
@@ -250,7 +250,7 @@ server.registerTool(
       const deckId = await ankiRequest<number>("createDeck", { deck: deck_name });
       const output = { deckId, deckName: deck_name };
       return {
-        content: [{ type: "text", text: `Created deck '${deck_name}' with ID: ${deckId}` }],
+        content: [{ type: "text", text: JSON.stringify(output) }],
         structuredContent: output,
       };
     } catch (error) {
@@ -297,7 +297,7 @@ server.registerTool(
       const cardsMoved = cardIds?.length || 0;
       const output = { oldName: old_name, newName: new_name, cardsMoved };
       return {
-        content: [{ type: "text", text: `Renamed '${old_name}' to '${new_name}' (${cardsMoved} cards moved)` }],
+        content: [{ type: "text", text: JSON.stringify(output) }],
         structuredContent: output,
       };
     } catch (error) {
