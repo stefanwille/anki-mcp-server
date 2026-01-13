@@ -7,7 +7,7 @@ A Model Context Protocol (MCP) server for managing [Anki](https://apps.ankiweb.n
 ## Prerequisites
 
 - [Anki](https://apps.ankiweb.net/) with [AnkiConnect](https://ankiweb.net/shared/info/2055492159) add-on installed
-- Node.js 22+ ([Download](https://nodejs.org/en/download))
+- Node.js 24+ ([Download](https://nodejs.org/en/download))
 - Anki running, with AnkiConnect on `http://127.0.0.1:8765` (default)
 
 ## Installation in Claude Desktop
@@ -110,6 +110,7 @@ pnpm unlink --global
 Create a GitHub release to trigger the npm publish workflow:
 
 ```bash
+pnpm login
 pnpm version patch  # or minor, major
 git push && git push --tags
 gh release create v$(node -p "require('./package.json').version") --generate-notes
