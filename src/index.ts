@@ -11,10 +11,6 @@ import { z } from "zod";
 const ANKI_CONNECT_URL = "http://127.0.0.1:8765";
 
 // Output schemas
-const DeckSchema = z.object({
-  name: z.string(),
-});
-
 const CardSchema = z.object({
   noteId: z.number(),
   front: z.string(),
@@ -63,14 +59,13 @@ server.registerTool(
     description: "Get all deck names from Anki",
     inputSchema: {},
     outputSchema: {
-      decks: z.array(DeckSchema),
+      decks: z.array(z.string()),
       total: z.number(),
     },
   },
   async () => {
     try {
-      const deckNames = await ankiRequest<string[]>("deckNames");
-      const decks = deckNames.map((name) => ({ name }));
+      const decks = await ankiRequest<string[]>("deckNames");
       const output = { decks, total: decks.length };
       return {
         content: [{ type: "text", text: `Found ${decks.length} decks` }],
