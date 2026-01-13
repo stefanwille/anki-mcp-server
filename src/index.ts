@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Anki MCP Server - TypeScript version
+ * Anki MCP Server
  * Connects to AnkiConnect to manage flashcards via MCP protocol
  */
 
@@ -60,13 +60,12 @@ server.registerTool(
     inputSchema: {},
     outputSchema: {
       decks: z.array(z.string()),
-      total: z.number(),
     },
   },
   async () => {
     try {
       const decks = await ankiRequest<string[]>("deckNames");
-      const output = { decks, total: decks.length };
+      const output = { decks };
       return {
         content: [{ type: "text", text: `Found ${decks.length} decks` }],
         structuredContent: output,
@@ -92,7 +91,6 @@ server.registerTool(
     },
     outputSchema: {
       cards: z.array(CardSchema),
-      total: z.number(),
     },
   },
   async ({ deck_name, limit }) => {
@@ -100,7 +98,7 @@ server.registerTool(
       const cardIds = await ankiRequest<number[]>("findCards", { query: `"deck:${deck_name}"` });
 
       if (!cardIds || cardIds.length === 0) {
-        const output = { cards: [], total: 0 };
+        const output = { cards: [] };
         return {
           content: [{ type: "text", text: "No cards found in this deck." }],
           structuredContent: output,
@@ -119,7 +117,7 @@ server.registerTool(
         back: card.fields.Back?.value || "",
       }));
 
-      const output = { cards, total: cards.length };
+      const output = { cards };
       return {
         content: [{ type: "text", text: `Found ${cards.length} cards` }],
         structuredContent: output,
