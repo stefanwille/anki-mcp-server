@@ -61,7 +61,7 @@ Restart Claude Desktop to activate.
 
 ### Prerequisites
 
-- Node.js 22+
+- Node.js 24+
 - pnpm ([Installation](https://pnpm.io/installation))
 
 ### Build from Source
