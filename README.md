@@ -83,27 +83,20 @@ Rebuilds automatically on file changes.
 
 ### Install Locally
 
-```bash
-pnpm link --global
-```
-
-This makes `stefanwille-anki-mcp-server` available system-wide. Update Claude Desktop config to use the command directly:
+Update Claude Desktop config to point directly to the built file:
 
 ```json
 {
   "mcpServers": {
     "anki": {
-      "command": "stefanwille-anki-mcp-server"
+      "command": "node",
+      "args": ["/absolute/path/to/anki-mcp-server/dist/index.js"]
     }
   }
 }
 ```
 
-### Uninstall Local Version
-
-```bash
-pnpm unlink --global
-```
+Replace `/absolute/path/to/anki-mcp-server` with your actual clone location.
 
 ### Publish to npm
 
