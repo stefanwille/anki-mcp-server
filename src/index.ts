@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Anki MCP Server - TypeScript version
+ * Anki MCP Server
  * Connects to AnkiConnect to manage flashcards via MCP protocol
  */
 
@@ -9,6 +9,13 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 
 const ANKI_CONNECT_URL = "http://127.0.0.1:8765";
+
+// Output schemas
+const CardSchema = z.object({
+  noteId: z.number(),
+  front: z.string(),
+  back: z.string(),
+});
 
 // Helper to send requests to AnkiConnect
 async function ankiRequest<T>(action: string, params: Record<string, unknown> = {}): Promise<T> {
@@ -51,12 +58,17 @@ server.registerTool(
     title: "Get Decks",
     description: "Get all deck names from Anki",
     inputSchema: {},
+    outputSchema: {
+      decks: z.array(z.string()),
+    },
   },
   async () => {
     try {
       const decks = await ankiRequest<string[]>("deckNames");
+      const output = { decks };
       return {
-        content: [{ type: "text", text: decks.join("\n") }],
+        content: [{ type: "text", text: `Found ${decks.length} decks` }],
+        structuredContent: output,
       };
     } catch (error) {
       return {
@@ -77,13 +89,20 @@ server.registerTool(
       deck_name: z.string().describe("Full deck name (e.g., 'Italian::Chapter 1')"),
       limit: z.number().default(50).describe("Maximum number of cards to return"),
     },
+    outputSchema: {
+      cards: z.array(CardSchema),
+    },
   },
   async ({ deck_name, limit }) => {
     try {
       const cardIds = await ankiRequest<number[]>("findCards", { query: `"deck:${deck_name}"` });
 
       if (!cardIds || cardIds.length === 0) {
-        return { content: [{ type: "text", text: "No cards found in this deck." }] };
+        const output = { cards: [] };
+        return {
+          content: [{ type: "text", text: "No cards found in this deck." }],
+          structuredContent: output,
+        };
       }
 
       const limitedIds = cardIds.slice(0, limit);
@@ -92,13 +111,17 @@ server.registerTool(
         fields: { Front?: { value: string }; Back?: { value: string } };
       }>>("cardsInfo", { cards: limitedIds });
 
-      const results = cardsInfo.map((card) => {
-        const front = card.fields.Front?.value || "";
-        const back = card.fields.Back?.value || "";
-        return `[Note ${card.note}]\nFront: ${front}\nBack: ${back}\n`;
-      });
+      const cards = cardsInfo.map((card) => ({
+        noteId: card.note,
+        front: card.fields.Front?.value || "",
+        back: card.fields.Back?.value || "",
+      }));
 
-      return { content: [{ type: "text", text: results.join("\n") }] };
+      const output = { cards };
+      return {
+        content: [{ type: "text", text: `Found ${cards.length} cards` }],
+        structuredContent: output,
+      };
     } catch (error) {
       return {
         content: [{ type: "text", text: `Failed to list cards: ${error instanceof Error ? error.message : String(error)}` }],
@@ -119,6 +142,10 @@ server.registerTool(
       front: z.string().describe("Front side content"),
       back: z.string().describe("Back side content"),
     },
+    outputSchema: {
+      noteId: z.number(),
+      deckName: z.string(),
+    },
   },
   async ({ deck_name, front, back }) => {
     try {
@@ -131,7 +158,11 @@ server.registerTool(
         },
       });
 
-      return { content: [{ type: "text", text: `Created card with note ID: ${noteId}` }] };
+      const output = { noteId, deckName: deck_name };
+      return {
+        content: [{ type: "text", text: `Created card with note ID: ${noteId}` }],
+        structuredContent: output,
+      };
     } catch (error) {
       return {
         content: [{ type: "text", text: `Failed to create card: ${error instanceof Error ? error.message : String(error)}` }],
@@ -151,6 +182,10 @@ server.registerTool(
       note_id: z.number().describe("The note ID to update"),
       front: z.string().optional().describe("New front content"),
       back: z.string().optional().describe("New back content"),
+    },
+    outputSchema: {
+      noteId: z.number(),
+      updated: z.boolean(),
     },
   },
   async ({ note_id, front, back }) => {
@@ -182,7 +217,11 @@ server.registerTool(
 
       await ankiRequest("updateNoteFields", { note: { id: note_id, fields } });
 
-      return { content: [{ type: "text", text: `Updated note ${note_id}` }] };
+      const output = { noteId: note_id, updated: true };
+      return {
+        content: [{ type: "text", text: `Updated note ${note_id}` }],
+        structuredContent: output,
+      };
     } catch (error) {
       return {
         content: [{ type: "text", text: `Failed to update card: ${error instanceof Error ? error.message : String(error)}` }],
@@ -201,11 +240,19 @@ server.registerTool(
     inputSchema: {
       deck_name: z.string().describe("Full deck name (use :: for nested decks)"),
     },
+    outputSchema: {
+      deckId: z.number(),
+      deckName: z.string(),
+    },
   },
   async ({ deck_name }) => {
     try {
       const deckId = await ankiRequest<number>("createDeck", { deck: deck_name });
-      return { content: [{ type: "text", text: `Created deck '${deck_name}' with ID: ${deckId}` }] };
+      const output = { deckId, deckName: deck_name };
+      return {
+        content: [{ type: "text", text: `Created deck '${deck_name}' with ID: ${deckId}` }],
+        structuredContent: output,
+      };
     } catch (error) {
       return {
         content: [{ type: "text", text: `Failed to create deck: ${error instanceof Error ? error.message : String(error)}` }],
@@ -225,6 +272,11 @@ server.registerTool(
       old_name: z.string().describe("Current full deck name"),
       new_name: z.string().describe("New full deck name"),
     },
+    outputSchema: {
+      oldName: z.string(),
+      newName: z.string(),
+      cardsMoved: z.number(),
+    },
   },
   async ({ old_name, new_name }) => {
     try {
@@ -242,8 +294,11 @@ server.registerTool(
       // Delete old deck
       await ankiRequest("deleteDecks", { decks: [old_name], cardsToo: true });
 
+      const cardsMoved = cardIds?.length || 0;
+      const output = { oldName: old_name, newName: new_name, cardsMoved };
       return {
-        content: [{ type: "text", text: `Renamed '${old_name}' to '${new_name}' (${cardIds?.length || 0} cards moved)` }],
+        content: [{ type: "text", text: `Renamed '${old_name}' to '${new_name}' (${cardsMoved} cards moved)` }],
+        structuredContent: output,
       };
     } catch (error) {
       return {
