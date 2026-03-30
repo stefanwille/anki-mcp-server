@@ -33,6 +33,40 @@ Edit your Claude Desktop config (`claude_desktop_config.json`), and add:
 
 Restart Claude Desktop to activate.
 
+## Troubleshooting
+
+### "Failed to spawn process" / "command not found: npx" on macOS
+
+Claude Desktop launches with a restricted `PATH` that doesn't include Node.js when installed via version managers like **Volta** or **nvm**. You'll see errors like:
+```
+Failed to spawn process: No such file or directory
+```
+or
+```
+node: command not found
+```
+
+**Fix:** Use the full path to `npx` and add the Node.js bin directory explicitly via `env`:
+```json
+{
+  "mcpServers": {
+    "anki": {
+      "command": "/Users/YOUR_USERNAME/.volta/bin/npx",
+      "args": ["-y", "stefanwille-anki-mcp-server@latest"],
+      "env": {
+        "PATH": "/Users/YOUR_USERNAME/.volta/bin:/usr/local/bin:/usr/bin:/bin"
+      }
+    }
+  }
+}
+```
+
+Replace `YOUR_USERNAME` with your macOS username and adjust the path if you use **nvm** (`~/.nvm/versions/node/vX.X.X/bin/`) or another version manager.
+
+Find your actual `npx` path by running in a terminal:
+```bash
+which npx
+```
 
 
 ## Example Prompts
