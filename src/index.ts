@@ -231,6 +231,38 @@ server.registerTool(
   }
 );
 
+// Tool: Delete cards
+server.registerTool(
+  "delete_cards",
+  {
+    title: "Delete Cards",
+    description: "Delete one or more cards from Anki by their note IDs",
+    inputSchema: {
+      note_ids: z.array(z.number()).describe("Note IDs to delete"),
+    },
+    outputSchema: {
+      noteIds: z.array(z.number()),
+      deleted: z.boolean(),
+    },
+  },
+  async ({ note_ids }) => {
+    try {
+      await ankiRequest("deleteNotes", { notes: note_ids });
+
+      const output = { noteIds: note_ids, deleted: true };
+      return {
+        content: [{ type: "text", text: JSON.stringify(output) }],
+        structuredContent: output,
+      };
+    } catch (error) {
+      return {
+        content: [{ type: "text", text: `Failed to delete cards: ${error instanceof Error ? error.message : String(error)}` }],
+        isError: true,
+      };
+    }
+  }
+);
+
 // Tool: Create a new deck
 server.registerTool(
   "create_deck",
