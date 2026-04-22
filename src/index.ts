@@ -131,41 +131,61 @@ server.registerTool(
   }
 );
 
-// Tool: Create a new card
+// Tool: Create one or more new cards
 server.registerTool(
-  "create_card",
+  "create_cards",
   {
-    title: "Create Card",
-    description: "Create a new basic card in Anki",
+    title: "Create Cards",
+    description: "Create one or more basic cards in an Anki deck. Duplicates are skipped (noteId will be null for those cards).",
     inputSchema: {
-      deck_name: z.string().describe("The deck to add the card to"),
-      front: z.string().describe("Front side content"),
-      back: z.string().describe("Back side content"),
+      deck_name: z.string().describe("The deck to add the cards to"),
+      cards: z
+        .array(
+          z.object({
+            front: z.string().describe("Front side content"),
+            back: z.string().describe("Back side content"),
+          })
+        )
+        .describe("Array of cards to create"),
     },
     outputSchema: {
-      noteId: z.number(),
       deckName: z.string(),
+      created: z.number(),
+      failed: z.number(),
+      results: z.array(
+        z.object({
+          front: z.string(),
+          noteId: z.number().nullable(),
+        })
+      ),
     },
   },
-  async ({ deck_name, front, back }) => {
+  async ({ deck_name, cards }) => {
     try {
-      const noteId = await ankiRequest<number>("addNote", {
-        note: {
+      const noteIds = await ankiRequest<(number | null)[]>("addNotes", {
+        notes: cards.map((card) => ({
           deckName: deck_name,
           modelName: "Basic",
-          fields: { Front: front, Back: back },
+          fields: { Front: card.front, Back: card.back },
           options: { allowDuplicate: false },
-        },
+        })),
       });
 
-      const output = { noteId, deckName: deck_name };
+      const results = cards.map((card, i) => ({
+        front: card.front,
+        noteId: noteIds[i] ?? null,
+      }));
+      const created = results.filter((r) => r.noteId !== null).length;
+      const failed = results.length - created;
+
+      const output = { deckName: deck_name, created, failed, results };
       return {
         content: [{ type: "text", text: JSON.stringify(output) }],
         structuredContent: output,
       };
     } catch (error) {
       return {
-        content: [{ type: "text", text: `Failed to create card: ${error instanceof Error ? error.message : String(error)}` }],
+        content: [{ type: "text", text: `Failed to create cards: ${error instanceof Error ? error.message : String(error)}` }],
         isError: true,
       };
     }

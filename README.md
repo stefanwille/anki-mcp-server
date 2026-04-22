@@ -1,6 +1,6 @@
 # Anki MCP Server
 
-[![npm](https://img.shields.io/npm/v/stefanwille-anki-mcp-server)](https://www.npmjs.com/package/stefanwille-anki-mcp-server)
+[npm](https://www.npmjs.com/package/stefanwille-anki-mcp-server)
 
 A Model Context Protocol (MCP) server for managing [Anki](https://apps.ankiweb.net/) flashcards. Connects to [AnkiConnect](https://foosoft.net/projects/anki-connect/) to enable AI assistants to create, read, and update flashcards.
 
@@ -11,7 +11,6 @@ A Model Context Protocol (MCP) server for managing [Anki](https://apps.ankiweb.n
 - Anki running, with AnkiConnect on `http://127.0.0.1:8765` (default)
 
 ## Installation in Claude Desktop
-
 
 - Open Claude Desktop
 - Go to: "Claude" / "Settings..."
@@ -38,15 +37,19 @@ Restart Claude Desktop to activate.
 ### "Failed to spawn process" / "command not found: npx" on macOS
 
 Claude Desktop launches with a restricted `PATH` that doesn't include Node.js when installed via version managers like **Volta** or **nvm**. You'll see errors like:
+
 ```
 Failed to spawn process: No such file or directory
 ```
+
 or
+
 ```
 node: command not found
 ```
 
 **Fix:** Use the full path to `npx` and add the Node.js bin directory explicitly via `env`:
+
 ```json
 {
   "mcpServers": {
@@ -64,10 +67,10 @@ node: command not found
 Replace `YOUR_USERNAME` with your macOS username and adjust the path if you use **nvm** (`~/.nvm/versions/node/vX.X.X/bin/`) or another version manager.
 
 Find your actual `npx` path by running in a terminal:
+
 ```bash
 which npx
 ```
-
 
 ## Example Prompts
 
@@ -82,14 +85,16 @@ which npx
 
 ## Tools
 
-| Tool | Description |
-|------|-------------|
-| `get_decks` | Get all deck names from Anki |
-| `create_deck` | Create a new deck |
-| `list_cards` | List cards in a deck with front/back content |
-| `create_card` | Create a new basic card |
-| `update_card` | Update an existing card's content |
-| `rename_deck` | Rename a deck |
+
+| Tool           | Description                                  |
+| -------------- | -------------------------------------------- |
+| `get_decks`    | Get all deck names from Anki                 |
+| `create_deck`  | Create a new deck                            |
+| `list_cards`   | List cards in a deck with front/back content |
+| `create_cards` | Create one or more basic cards in a deck     |
+| `update_card`  | Update an existing card's content            |
+| `rename_deck`  | Rename a deck                                |
+
 
 ## Development
 
@@ -137,7 +142,8 @@ Replace `/absolute/path/to/anki-mcp-server` with your actual clone location.
 Create a GitHub release to trigger the npm publish workflow:
 
 ```bash
-pnpm login
+pnpm login 
+# If pnpm login produces a 404 page, try pnpm login again
 pnpm version patch  # or minor, major
 git push && git push --tags
 gh release create v$(node -p "require('./package.json').version") --generate-notes
