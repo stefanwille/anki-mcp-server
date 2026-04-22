@@ -19,7 +19,7 @@ pnpm dev        # Run directly with tsx (no build needed)
 
 Single source file (`src/index.ts`) containing:
 - `ankiRequest<T>()` - Generic HTTP wrapper for AnkiConnect API calls
-- Tool registrations: `get_decks`, `list_cards`, `create_cards`, `update_card`, `delete_cards`, `create_deck`, `rename_deck`
+- Tool registrations: `get_decks`, `list_cards`, `create_cards`, `update_card`, `delete_cards`, `create_deck`, `delete_deck`, `rename_deck`
 - Stdio transport for MCP communication
 
 AnkiConnect endpoint: `http://127.0.0.1:8765`

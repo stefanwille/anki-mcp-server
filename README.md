@@ -90,6 +90,7 @@ which npx
 | -------------- | -------------------------------------------- |
 | `get_decks`    | Get all deck names from Anki                 |
 | `create_deck`  | Create a new deck                            |
+| `delete_deck`  | Delete a deck and all its cards (including sub-decks) |
 | `list_cards`   | List cards in a deck with front/back content |
 | `create_cards` | Create one or more basic cards in a deck     |
 | `update_card`  | Update an existing card's content            |

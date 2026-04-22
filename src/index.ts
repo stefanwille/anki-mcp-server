@@ -314,6 +314,43 @@ server.registerTool(
   }
 );
 
+// Tool: Delete a deck
+server.registerTool(
+  "delete_deck",
+  {
+    title: "Delete Deck",
+    description:
+      "Delete a deck and all its cards. Also deletes any nested sub-decks (e.g. deleting 'Italian' also deletes 'Italian::Chapter1').",
+    inputSchema: {
+      deck_name: z.string().describe("Full deck name to delete (use :: for nested decks)"),
+    },
+    outputSchema: {
+      deckName: z.string(),
+      deleted: z.boolean(),
+      cardsDeleted: z.number(),
+    },
+  },
+  async ({ deck_name }) => {
+    try {
+      const cardIds = await ankiRequest<number[]>("findCards", { query: `"deck:${deck_name}"` });
+      await ankiRequest("deleteDecks", { decks: [deck_name], cardsToo: true });
+
+      const output = { deckName: deck_name, deleted: true, cardsDeleted: cardIds?.length ?? 0 };
+      return {
+        content: [{ type: "text", text: JSON.stringify(output) }],
+        structuredContent: output,
+      };
+    } catch (error) {
+      return {
+        content: [
+          { type: "text", text: `Failed to delete deck: ${error instanceof Error ? error.message : String(error)}` },
+        ],
+        isError: true,
+      };
+    }
+  }
+);
+
 // Tool: Rename a deck
 server.registerTool(
   "rename_deck",
