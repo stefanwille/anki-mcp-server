@@ -10,13 +10,6 @@ import { z } from "zod";
 
 const ANKI_CONNECT_URL = "http://127.0.0.1:8765";
 
-// Output schemas
-const CardSchema = z.object({
-  noteId: z.number(),
-  front: z.string(),
-  back: z.string(),
-});
-
 // Helper to send requests to AnkiConnect
 async function ankiRequest<T>(action: string, params: Record<string, unknown> = {}): Promise<T> {
   const controller = new AbortController();
@@ -51,16 +44,30 @@ const server = new McpServer({
   version: "1.0.0",
 });
 
+/**
+ * Wraps `registerTool` so a duplicate name or synchronous registration error is visible in stderr
+ * (e.g. Claude Desktop MCP logs). The SDK may still convert schemas lazily on `tools/list`.
+ */
+const registerAnkiTool: typeof server.registerTool = (name, config, cb) => {
+  try {
+    return server.registerTool(name, config, cb);
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.error(`[anki-mcp] registerTool failed: "${name}" — ${msg}`);
+    if (error instanceof Error && error.stack) {
+      console.error(error.stack);
+    }
+    throw error;
+  }
+};
+
 // Tool: Get all decks
-server.registerTool(
+registerAnkiTool(
   "get_decks",
   {
     title: "Get Decks",
     description: "Get all deck names from Anki",
     inputSchema: {},
-    outputSchema: {
-      decks: z.array(z.string()),
-    },
   },
   async () => {
     try {
@@ -80,17 +87,14 @@ server.registerTool(
 );
 
 // Tool: List cards in a deck
-server.registerTool(
+registerAnkiTool(
   "list_cards",
   {
     title: "List Cards",
-    description: "List cards in a deck with their front/back content",
+    description: "List card sides in a deck (uses Basic model).",
     inputSchema: {
-      deck_name: z.string().describe("Full deck name (e.g., 'Italian::Chapter 1')"),
-      limit: z.number().default(50).describe("Maximum number of cards to return"),
-    },
-    outputSchema: {
-      cards: z.array(CardSchema),
+      deck_name: z.string(),
+      limit: z.number().default(50),
     },
   },
   async ({ deck_name, limit }) => {
@@ -132,30 +136,17 @@ server.registerTool(
 );
 
 // Tool: Create one or more new cards
-server.registerTool(
+registerAnkiTool(
   "create_cards",
   {
     title: "Create Cards",
-    description: "Create one or more basic cards in an Anki deck. Duplicates are skipped (noteId will be null for those cards).",
+    description: "Add Basic note(s) to a deck. Duplicates skipped (null noteId in results).",
     inputSchema: {
-      deck_name: z.string().describe("The deck to add the cards to"),
-      cards: z
-        .array(
-          z.object({
-            front: z.string().describe("Front side content"),
-            back: z.string().describe("Back side content"),
-          })
-        )
-        .describe("Array of cards to create"),
-    },
-    outputSchema: {
-      deckName: z.string(),
-      created: z.number(),
-      failed: z.number(),
-      results: z.array(
+      deck_name: z.string(),
+      cards: z.array(
         z.object({
           front: z.string(),
-          noteId: z.number().nullable(),
+          back: z.string(),
         })
       ),
     },
@@ -193,19 +184,15 @@ server.registerTool(
 );
 
 // Tool: Update an existing card
-server.registerTool(
+registerAnkiTool(
   "update_card",
   {
     title: "Update Card",
     description: "Update an existing card's content",
     inputSchema: {
-      note_id: z.number().describe("The note ID to update"),
-      front: z.string().optional().describe("New front content"),
-      back: z.string().optional().describe("New back content"),
-    },
-    outputSchema: {
-      noteId: z.number(),
-      updated: z.boolean(),
+      note_id: z.number(),
+      front: z.string().optional(),
+      back: z.string().optional(),
     },
   },
   async ({ note_id, front, back }) => {
@@ -252,17 +239,13 @@ server.registerTool(
 );
 
 // Tool: Delete cards
-server.registerTool(
+registerAnkiTool(
   "delete_cards",
   {
     title: "Delete Cards",
     description: "Delete one or more cards from Anki by their note IDs",
     inputSchema: {
-      note_ids: z.array(z.number()).describe("Note IDs to delete"),
-    },
-    outputSchema: {
-      noteIds: z.array(z.number()),
-      deleted: z.boolean(),
+      note_ids: z.array(z.number()),
     },
   },
   async ({ note_ids }) => {
@@ -284,17 +267,13 @@ server.registerTool(
 );
 
 // Tool: Create a new deck
-server.registerTool(
+registerAnkiTool(
   "create_deck",
   {
     title: "Create Deck",
     description: "Create a new deck in Anki",
     inputSchema: {
-      deck_name: z.string().describe("Full deck name (use :: for nested decks)"),
-    },
-    outputSchema: {
-      deckId: z.number(),
-      deckName: z.string(),
+      deck_name: z.string(),
     },
   },
   async ({ deck_name }) => {
@@ -315,19 +294,13 @@ server.registerTool(
 );
 
 // Tool: Delete a deck
-server.registerTool(
+registerAnkiTool(
   "delete_deck",
   {
     title: "Delete Deck",
-    description:
-      "Delete a deck and all its cards. Also deletes any nested sub-decks (e.g. deleting 'Italian' also deletes 'Italian::Chapter1').",
+    description: "Delete deck, nested decks, and all their cards.",
     inputSchema: {
-      deck_name: z.string().describe("Full deck name to delete (use :: for nested decks)"),
-    },
-    outputSchema: {
-      deckName: z.string(),
-      deleted: z.boolean(),
-      cardsDeleted: z.number(),
+      deck_name: z.string(),
     },
   },
   async ({ deck_name }) => {
@@ -352,19 +325,14 @@ server.registerTool(
 );
 
 // Tool: Rename a deck
-server.registerTool(
+registerAnkiTool(
   "rename_deck",
   {
     title: "Rename Deck",
     description: "Rename a deck in Anki",
     inputSchema: {
-      old_name: z.string().describe("Current full deck name"),
-      new_name: z.string().describe("New full deck name"),
-    },
-    outputSchema: {
-      oldName: z.string(),
-      newName: z.string(),
-      cardsMoved: z.number(),
+      old_name: z.string(),
+      new_name: z.string(),
     },
   },
   async ({ old_name, new_name }) => {
@@ -402,7 +370,9 @@ server.registerTool(
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Anki MCP server running on stdio");
+  console.error(
+    "Anki MCP: 8 tools — get_decks, list_cards, create_cards, update_card, delete_cards, create_deck, delete_deck, rename_deck"
+  );
 }
 
 main().catch(console.error);

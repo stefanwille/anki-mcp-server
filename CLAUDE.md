@@ -29,7 +29,8 @@ AnkiConnect endpoint: `http://127.0.0.1:8765`
 Each tool follows:
 ```typescript
 server.registerTool("tool_name", {
-  title, description, inputSchema, outputSchema
+  title, description, inputSchema
+  // outputSchema omitted to keep tools/list small (Claude Desktop can drop large lists)
 }, async (params) => {
   // Return { content, structuredContent } or { content, isError: true }
 })
